@@ -42,6 +42,30 @@ fn test_linked_list() {
 }
 
 #[test]
+fn test_linked_list_iter_mut_pop() {
+    let mut values = [0usize; 3];
+    let base = values.as_mut_ptr();
+    let (value1, value2, value3) = unsafe { (base, base.add(1), base.add(2)) };
+    let mut list = linked_list::LinkedList::new();
+    unsafe {
+        list.push(value1);
+        list.push(value2);
+        list.push(value3);
+    }
+
+    // Remove a node in the middle, then the head, through `iter_mut`
+    assert_eq!(list.iter_mut().nth(1).unwrap().pop(), value2);
+    assert_eq!(list.iter_mut().next().unwrap().pop(), value3);
+
+    // The list must still be usable
+    let mut iter = list.iter();
+    assert_eq!(iter.next(), Some(value1));
+    assert_eq!(iter.next(), None);
+    assert_eq!(list.pop(), Some(value1));
+    assert_eq!(list.pop(), None);
+}
+
+#[test]
 fn test_empty_heap() {
     let mut heap = Heap::<32>::new();
     assert!(heap.alloc(Layout::from_size_align(1, 1).unwrap()).is_err());

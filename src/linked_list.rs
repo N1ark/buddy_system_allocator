@@ -116,9 +116,12 @@ pub struct ListNode {
 impl ListNode {
     /// Remove the node from the list
     pub fn pop(self) -> *mut usize {
-        // Skip the current one
+        // Skip the current one. `prev` points either to the list's `head`
+        // (a `*mut usize`) or to the link word of the previous node, so write
+        // the link back as a pointer: storing a plain `usize` into `head`
+        // would leave it without provenance.
         unsafe {
-            *(self.prev) = *(self.curr);
+            *(self.prev as *mut *mut usize) = *(self.curr) as *mut usize;
         }
         self.curr
     }
